@@ -20,15 +20,26 @@ model = changeos.from_name(model_name)
 
 # Upload images
 st.sidebar.header("Upload Images")
-pre_image = st.sidebar.file_uploader("Upload Pre-disaster Image", type=["png", "jpg", "jpeg"])
-post_image = st.sidebar.file_uploader("Upload Post-disaster Image", type=["png", "jpg", "jpeg"])
+pre_image_file = st.sidebar.file_uploader("Upload Pre-disaster Image", type=["png", "jpg", "jpeg"])
+post_image_file = st.sidebar.file_uploader("Upload Post-disaster Image", type=["png", "jpg", "jpeg"])
 
-# Ensure both images are uploaded
-if pre_image and post_image:
-    # Open uploaded images
-    pre_disaster_image = Image.open(pre_image)
-    post_disaster_image = Image.open(post_image)
+def check_image_resolution(image_file):
+    """Check if the uploaded image is 1024x1024."""
+    if image_file is not None:
+        image = Image.open(image_file)
+        if image.size == (1024, 1024):
+            return image
+        else:
+            st.sidebar.error(f"Image must be 1024x1024 resolution. Uploaded image size: {image.size}")
+            return None
+    return None
 
+# Validate images
+pre_disaster_image = check_image_resolution(pre_image_file)
+post_disaster_image = check_image_resolution(post_image_file)
+
+# Ensure both images are uploaded and valid
+if pre_disaster_image and post_disaster_image:
     # Display input images
     st.subheader("Uploaded Images")
     col1, col2 = st.columns(2)
@@ -56,4 +67,4 @@ if pre_image and post_image:
             st.image(dam, caption="Damage Assessment", use_column_width=True)
 
 else:
-    st.write("Please upload both pre- and post-disaster images to proceed.")
+    st.write("Please upload both pre- and post-disaster images with a resolution of 1024x1024 to proceed.")
