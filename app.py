@@ -23,38 +23,37 @@ st.sidebar.header("Upload Images")
 pre_image = st.sidebar.file_uploader("Upload Pre-disaster Image", type=["png", "jpg", "jpeg"])
 post_image = st.sidebar.file_uploader("Upload Post-disaster Image", type=["png", "jpg", "jpeg"])
 
-# Use demo data if images are not uploaded
+# Ensure both images are uploaded
 if pre_image and post_image:
-    st.write("Using uploaded images.")
+    # Open uploaded images
     pre_disaster_image = Image.open(pre_image)
     post_disaster_image = Image.open(post_image)
+
+    # Display input images
+    st.subheader("Uploaded Images")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(pre_disaster_image, caption="Pre-disaster Image", use_column_width=True)
+    with col2:
+        st.image(post_disaster_image, caption="Post-disaster Image", use_column_width=True)
+
+    # Add a button to trigger change detection
+    if st.button("Detect Changes"):
+        # Perform inference
+        st.write("Running inference on the uploaded images...")
+        loc, dam = model(pre_disaster_image, post_disaster_image)
+
+        # Visualize the results
+        st.write("Visualizing results...")
+        loc, dam = changeos.visualize(loc, dam)
+
+        # Display output images
+        st.subheader("Detected Changes")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(loc, caption="Localization of Changes", use_column_width=True)
+        with col2:
+            st.image(dam, caption="Damage Assessment", use_column_width=True)
+
 else:
-    st.write("Using demo data as no images were uploaded.")
-    pre_disaster_image, post_disaster_image = changeos.demo_data()
-
-# Display input images
-st.subheader("Input Images")
-col1, col2 = st.columns(2)
-with col1:
-    st.image(pre_disaster_image, caption="Pre-disaster Image", use_column_width=True)
-with col2:
-    st.image(post_disaster_image, caption="Post-disaster Image", use_column_width=True)
-
-# Perform inference
-st.write("Running inference on the images...")
-loc, dam = model(pre_disaster_image, post_disaster_image)
-
-# Visualize the results
-st.write("Visualizing results...")
-loc, dam = changeos.visualize(loc, dam)
-
-# Display output images
-st.subheader("Detected Changes")
-col1, col2 = st.columns(2)
-with col1:
-    st.image(loc, caption="Localization of Changes", use_column_width=True)
-with col2:
-    st.image(dam, caption="Damage Assessment", use_column_width=True)
-
-# Display additional details if required
-st.sidebar.write("Adjust visualization or processing settings from the sidebar.")
+    st.write("Please upload both pre- and post-disaster images to proceed.")
