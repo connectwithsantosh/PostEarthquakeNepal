@@ -1,70 +1,107 @@
 import streamlit as st
 import changeos
-import matplotlib.pyplot as plt
 from PIL import Image
 
-# Streamlit app setup
-st.title("ChangeOS: Change Detection in Images")
-st.write("This app demonstrates the use of ChangeOS to detect changes in pre- and post-disaster images.")
+from utils.general import translate
 
-# Sidebar for selecting a ChangeOS model
-model_name = st.sidebar.selectbox(
-    "Select ChangeOS model",
-    ['changeos_r18', 'changeos_r34', 'changeos_r50', 'changeos_r101'],
-    index=3
-)
 
-# Load the ChangeOS model
-st.write(f"Loading the ChangeOS model: **{model_name}**")
-model = changeos.from_name(model_name)
+# Main app setup
+def main():
+    # Language Selection
+    lang = st.sidebar.selectbox("Language", ["en", "ne"], index=0)
+    
+    # App Title and Description
+    st.title(translate("title", lang))
+    st.write(translate("description", lang))
+    
+    # Help Section
+    if st.checkbox("Help"):
+        st.write(f"### {translate('help_title', lang)}")
+        st.write(translate("help_text", lang))
+    
+    # Sidebar Operations
+    model_name = select_model(lang)
+    model = load_model(model_name, lang)
+    
+    pre_image_file, post_image_file = upload_images(lang)
+    pre_disaster_image, post_disaster_image = validate_images(pre_image_file, post_image_file, lang)
+    
+    # Image Analysis and Results
+    if pre_disaster_image and post_disaster_image:
+        display_uploaded_images(pre_disaster_image, post_disaster_image, lang)
+        if st.button(translate("detect_changes", lang)):
+            detect_changes(model, pre_disaster_image, post_disaster_image, lang)
+    else:
+        st.write(translate("upload_prompt", lang))
 
-# Upload images
-st.sidebar.header("Upload Images")
-pre_image_file = st.sidebar.file_uploader("Upload Pre-disaster Image", type=["png", "jpg", "jpeg"])
-post_image_file = st.sidebar.file_uploader("Upload Post-disaster Image", type=["png", "jpg", "jpeg"])
 
-def check_image_resolution(image_file):
-    """Check if the uploaded image is 1024x1024."""
-    if image_file is not None:
-        image = Image.open(image_file)
-        if image.size == (1024, 1024):
-            return image
-        else:
-            st.sidebar.error(f"Image must be 1024x1024 resolution. Uploaded image size: {image.size}")
-            return None
-    return None
+# Sidebar model selection
+def select_model(lang):
+    return st.sidebar.selectbox(
+        translate("model_label", lang),
+        ['changeos_r18', 'changeos_r34', 'changeos_r50', 'changeos_r101'],
+        index=3
+    )
 
-# Validate images
-pre_disaster_image = check_image_resolution(pre_image_file)
-post_disaster_image = check_image_resolution(post_image_file)
 
-# Ensure both images are uploaded and valid
-if pre_disaster_image and post_disaster_image:
-    # Display input images
-    st.subheader("Uploaded Images")
+# Load the model with a progress bar
+def load_model(model_name, lang):
+    st.sidebar.write(f"{translate('loading_model', lang)}: **{model_name}**")
+    model = changeos.from_name(model_name)
+    return model
+
+
+# Upload images through the sidebar
+def upload_images(lang):
+    st.sidebar.header(translate("upload_images", lang))
+    pre_image_file = st.sidebar.file_uploader(translate("pre_image_label", lang), type=["png", "jpg", "jpeg"])
+    post_image_file = st.sidebar.file_uploader(translate("post_image_label", lang), type=["png", "jpg", "jpeg"])
+    return pre_image_file, post_image_file
+
+
+# Validate image resolution
+def validate_images(pre_image_file, post_image_file, lang):
+    def check_image_resolution(image_file):
+        if image_file is not None:
+            image = Image.open(image_file)
+            if image.size == (1024, 1024):
+                return image
+            else:
+                st.sidebar.error(f"{translate('error_resolution', lang)} {image.size}")
+                return None
+        return None
+
+    pre_disaster_image = check_image_resolution(pre_image_file)
+    post_disaster_image = check_image_resolution(post_image_file)
+    return pre_disaster_image, post_disaster_image
+
+
+# Display uploaded images
+def display_uploaded_images(pre_disaster_image, post_disaster_image, lang):
+    st.subheader(translate("uploaded_images", lang))
     col1, col2 = st.columns(2)
     with col1:
-        st.image(pre_disaster_image, caption="Pre-disaster Image", use_column_width=True)
+        st.image(pre_disaster_image, caption=translate("pre_image_label", lang), use_column_width=True)
     with col2:
-        st.image(post_disaster_image, caption="Post-disaster Image", use_column_width=True)
+        st.image(post_disaster_image, caption=translate("post_image_label", lang), use_column_width=True)
 
-    # Add a button to trigger change detection
-    if st.button("Detect Changes"):
-        # Perform inference
-        st.write("Running inference on the uploaded images...")
-        loc, dam = model(pre_disaster_image, post_disaster_image)
 
-        # Visualize the results
-        st.write("Visualizing results...")
-        loc, dam = changeos.visualize(loc, dam)
+# Perform change detection and display results
+def detect_changes(model, pre_disaster_image, post_disaster_image, lang):
+    st.write(translate("loading_model", lang))
+    loc, dam = model(pre_disaster_image, post_disaster_image)
 
-        # Display output images
-        st.subheader("Detected Changes")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(loc, caption="Localization of Changes", use_column_width=True)
-        with col2:
-            st.image(dam, caption="Damage Assessment", use_column_width=True)
+    st.write(translate("change_localization", lang))
+    loc, dam = changeos.visualize(loc, dam)
 
-else:
-    st.write("Please upload both pre- and post-disaster images with a resolution of 1024x1024 to proceed.")
+    st.subheader(translate("uploaded_images", lang))
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(loc, caption=translate("change_localization", lang), use_column_width=True)
+    with col2:
+        st.image(dam, caption=translate("damage_assessment", lang), use_column_width=True)
+
+
+# Run the app
+if __name__ == "__main__":
+    main()
