@@ -1,16 +1,16 @@
 import os
 import requests
 
-# Define the version of the models (replace 'V' with the actual version, e.g., '0.2')
-V = '0.2'
+# Define the version of the models (replace 'V' with the actual version, e.g., '1.0')
+V = '1.0'
 
 # Define the available models with URLs
-AVAILABLE_MODELS = {
-    "changeos_r18": f"https://github.com/Z-Zheng/ChangeOS/releases/download/v{V}/changeos_r18.pt",
-    "changeos_r34": f"https://github.com/Z-Zheng/ChangeOS/releases/download/v{V}/changeos_r34.pt",
-    "changeos_r50": f"https://github.com/Z-Zheng/ChangeOS/releases/download/v{V}/changeos_r50.pt",
-    "changeos_r101": f"https://github.com/Z-Zheng/ChangeOS/releases/download/v{V}/changeos_r101.pt",
-}
+AVAILABLE_MODELS = dict(
+    changeos_r18=f'https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v{V}/changeos_r18.pt',
+    changeos_r34=f'https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v{V}/changeos_r34.pt',
+    changeos_r50=f'https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v{V}/changeos_r50.pt',
+    changeos_r101=f'https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v{V}/changeos_r101.pt',
+)
 
 # Directory to save the downloaded models
 SAVE_DIR = "./models/changeos"

@@ -1,32 +1,31 @@
 import streamlit as st
 import changeos
 from PIL import Image
-
+import requests
+from io import BytesIO
 from utils.general import translate
-
 
 # Main app setup
 def main():
     # Language Selection
     lang = st.sidebar.selectbox("Language", ["en", "ne"], index=0)
 
-    
     # App Title and Description
     st.title(translate("title", lang))
     st.write(translate("description", lang))
-    
+
     # Help Section
     if st.checkbox("Help"):
         st.write(f"### {translate('help_title', lang)}")
         st.write(translate("help_text", lang))
-    
+
     # Sidebar Operations
     model_name = select_model(lang)
     model = load_model(model_name, lang)
-    
+
     pre_image_file, post_image_file = upload_images(lang)
     pre_disaster_image, post_disaster_image = validate_images(pre_image_file, post_image_file, lang)
-    
+
     # Image Analysis and Results
     if pre_disaster_image and post_disaster_image:
         display_uploaded_images(pre_disaster_image, post_disaster_image, lang)
@@ -34,6 +33,15 @@ def main():
             detect_changes(model, pre_disaster_image, post_disaster_image, lang)
     else:
         st.write(translate("upload_prompt", lang))
+
+        # Demo Data Selection
+        st.write(translate("demo_data_prompt", lang))
+        demo_selection = st.selectbox(translate("select_demo", lang), ["Sample 1", "Sample 2"])
+
+        if st.button(translate("run_demo", lang)):
+            pre_demo_image, post_demo_image = load_demo_images(demo_selection, lang)
+            display_uploaded_images(pre_demo_image, post_demo_image, lang)
+            detect_changes(model, pre_demo_image, post_demo_image, lang)
 
 
 # Sidebar model selection
@@ -112,6 +120,29 @@ def detect_changes(model, pre_disaster_image, post_disaster_image, lang):
         st.error(f"An error occurred while detecting changes: {str(e)}")
         st.write("Please try again or check the error details.")
         st.write(f"Error details: {str(e)}")  # Optional: Show error details for debugging
+
+
+# Load demo images from GitHub releases
+def load_demo_images(demo_selection, lang):
+    demo_data_urls = {
+        "Sample 1": {
+            "pre": "https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v1.0/pre-disaster-s1.png",
+            "post": "https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v1.0/post-disaster-s1.png"
+        },
+        "Sample 2": {
+            "pre": "https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v1.0/pre-disaster-s2.jpg",
+            "post": "https://github.com/connectwithsantosh/PostEarthquakeNepal/releases/download/v1.0/post-disaster-s2.jpg"
+        }
+    }
+
+    urls = demo_data_urls.get(demo_selection)
+    if urls:
+        pre_image = Image.open(BytesIO(requests.get(urls["pre"]).content))
+        post_image = Image.open(BytesIO(requests.get(urls["post"]).content))
+        return pre_image, post_image
+    else:
+        st.error(translate("demo_error", lang))
+        return None, None
 
 
 # Run the app
