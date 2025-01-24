@@ -1,6 +1,8 @@
 # Translation dictionary for Nepali
 TRANSLATIONS = {
     "en": {
+        "postBuild_message": "Successfully downloaded large model files from Git LFS.",
+        "postBuild_error": "Error while running the post-build script",
         "title": "ChangeOS: Change Detection in Images",
         "description": "This app demonstrates the use of ChangeOS to detect changes in pre- and post-disaster images.",
         "help_title": "Help: How to Use This App",
@@ -25,6 +27,8 @@ TRANSLATIONS = {
         "upload_prompt": "Please upload both pre- and post-disaster images with a resolution of 1024x1024 to proceed.",
     },
     "ne": {
+        "postBuild_message": "Git LFS बाट ठूलो मोडेल फाइलहरू सफलतापूर्वक डाउनलोड गरियो।",
+        "postBuild_error": "पोस्ट-बिल्ड स्क्रिप्ट चलाउँदा त्रुटि आएको छ।",
         "title": "ChangeOS: चित्रहरूमा परिवर्तन पहिचान",
         "description": "यो एपले ChangeOS प्रयोग गरेर विपद् अगाडि र पछिका चित्रहरूमा भएको परिवर्तन पहिचान गर्दछ।",
         "help_title": "सहयोग: यस एप्लिकेसन कसरी प्रयोग गर्ने",

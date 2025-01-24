@@ -7,29 +7,23 @@ from utils.general import translate
 
 
 # Run the post-build setup script to pull LFS files
-def run_post_build_script():
+def run_post_build_script(lang):
     try:
-        result = subprocess.run(
-            ["bash", "setup.sh"],
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        st.write("Successfully downloaded large model files from Git LFS.")
-        st.write(result.stdout.decode())  # Log output
+        subprocess.run(["bash", "setup.sh"], check=True)
+        st.write(translate("postBuild_message", lang)) 
     except subprocess.CalledProcessError as e:
-        st.error(f"Error while running the post-build script: {e}")
-        st.error(f"Standard Output: {e.stdout.decode()}")
-        st.error(f"Standard Error: {e.stderr.decode()}")
+        st.error(f"{translate('postBuild_error', lang)}: {e}")  
+
     
 
 # Main app setup
 def main():
-    # Run post-build script (downloads large files from LFS)
-    run_post_build_script()
-
     # Language Selection
     lang = st.sidebar.selectbox("Language", ["en", "ne"], index=0)
+    
+    # Run post-build script (downloads large files from LFS)
+    run_post_build_script(lang)
+
     
     # App Title and Description
     st.title(translate("title", lang))
@@ -109,18 +103,30 @@ def display_uploaded_images(pre_disaster_image, post_disaster_image, lang):
 
 # Perform change detection and display results
 def detect_changes(model, pre_disaster_image, post_disaster_image, lang):
-    st.write(translate("loading_model", lang))
-    loc, dam = model(pre_disaster_image, post_disaster_image)
+    try:
+        # Display loading message
+        st.write(translate("loading_model", lang))
 
-    st.write(translate("change_localization", lang))
-    loc, dam = changeos.visualize(loc, dam)
+        # Perform the change detection
+        loc, dam = model(pre_disaster_image, post_disaster_image)
 
-    st.subheader(translate("uploaded_images", lang))
-    col1, col2 = st.columns(2)
-    with col1:
-        st.image(loc, caption=translate("change_localization", lang), use_container_width=True)
-    with col2:
-        st.image(dam, caption=translate("damage_assessment", lang), use_container_width=True)
+        st.write(translate("change_localization", lang))
+        loc, dam = changeos.visualize(loc, dam)
+
+        # Display images side by side
+        st.subheader(translate("uploaded_images", lang))
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(loc, caption=translate("change_localization", lang), use_container_width=True)
+        with col2:
+            st.image(dam, caption=translate("damage_assessment", lang), use_container_width=True)
+
+    except Exception as e:
+        # Catch any error and display it in the Streamlit app
+        st.error(f"An error occurred while detecting changes: {str(e)}")
+        st.write("Please try again or check the error details.")
+        st.write(f"Error details: {str(e)}")  # Optional: Show error details for debugging
+
 
 
 # Run the app
