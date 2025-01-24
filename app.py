@@ -23,6 +23,11 @@ def main():
     model_name = select_model(lang)
     model = load_model(model_name, lang)
 
+    # Stop execution if the model is not loaded
+    if model is None:
+        st.error(translate("model_load_failed", lang))
+        return
+
     pre_image_file, post_image_file = upload_images(lang)
     pre_disaster_image, post_disaster_image = validate_images(pre_image_file, post_image_file, lang)
 
@@ -53,11 +58,17 @@ def select_model(lang):
     )
 
 
-# Load the model with a progress bar
+# Load the model 
 def load_model(model_name, lang):
-    st.sidebar.write(f"{translate('loading_model', lang)}: **{model_name}**")
-    model = changeos.from_name(model_name)
-    return model
+    try:
+        st.sidebar.write(f"{translate('loading_model', lang)}: **{model_name}**")
+        model = changeos.from_name(model_name)
+        if model is None:
+            raise ValueError(f"Model '{model_name}' could not be loaded.")
+        return model
+    except Exception as e:
+        st.sidebar.error(f"{translate('model_error', lang)}: {str(e)}")
+        return None
 
 
 # Upload images through the sidebar

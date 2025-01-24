@@ -77,21 +77,38 @@ def _object_vote(loc, dam):
     return new_dam
 
 
+# def _download_model(name):
+#     assert name in list_available_models(), f'{name} is unsupported.'
+#     url = AVAILABLE_MODELS[name]
+#     hub_dir = get_dir()
+#     model_dir = os.path.join(hub_dir, 'checkpoints')
+#     parts = urlparse(url)
+#     filename = os.path.basename(parts.path)
+#     cached_file = os.path.join(model_dir, filename)
+#     if not os.path.exists(cached_file):
+#         sys.stderr.write('Downloading: "{}" to {}\n'.format(url, cached_file))
+#         os.makedirs(model_dir, exist_ok=True)
+#         download_url_to_file(url, cached_file)
+
+#     model = torch.jit.load(cached_file)
+#     return model
+
+
 def _download_model(name):
     assert name in list_available_models(), f'{name} is unsupported.'
-    url = AVAILABLE_MODELS[name]
-    hub_dir = get_dir()
-    model_dir = os.path.join(hub_dir, 'checkpoints')
-    parts = urlparse(url)
-    filename = os.path.basename(parts.path)
-    cached_file = os.path.join(model_dir, filename)
-    if not os.path.exists(cached_file):
-        sys.stderr.write('Downloading: "{}" to {}\n'.format(url, cached_file))
-        os.makedirs(model_dir, exist_ok=True)
-        download_url_to_file(url, cached_file)
+    
+    # Offline models directory
+    offline_model_dir = os.path.join("models", "changeos")
+    filename = f"{name}.pt"  # Assume filenames follow the format "<model_name>.pt"
+    offline_file = os.path.join(offline_model_dir, filename)
 
-    model = torch.jit.load(cached_file)
-    return model
+    # Check for offline model
+    if os.path.exists(offline_file):
+        sys.stderr.write(f'Loading offline model: {offline_file}\n')
+        model = torch.jit.load(offline_file)
+        return model
+    else:
+        raise FileNotFoundError(f"Model '{name}' not found in '{offline_model_dir}'. Ensure the file '{filename}' is present.")
 
 
 def list_available_models():
