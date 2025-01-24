@@ -13,8 +13,7 @@ def run_post_build_script(lang):
         st.write(translate("postBuild_message", lang)) 
     except subprocess.CalledProcessError as e:
         st.error(f"{translate('postBuild_error', lang)}: {e}")  
-
-    
+           
 
 # Main app setup
 def main():
@@ -126,7 +125,6 @@ def detect_changes(model, pre_disaster_image, post_disaster_image, lang):
         st.error(f"An error occurred while detecting changes: {str(e)}")
         st.write("Please try again or check the error details.")
         st.write(f"Error details: {str(e)}")  # Optional: Show error details for debugging
-
 
 
 # Run the app
