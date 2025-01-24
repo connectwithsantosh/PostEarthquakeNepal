@@ -1,27 +1,14 @@
 import streamlit as st
 import changeos
 from PIL import Image
-import subprocess  # To run the shell script
 
 from utils.general import translate
 
-
-# Run the post-build setup script to pull LFS files
-def run_post_build_script(lang):
-    try:
-        subprocess.run(["bash", "setup.sh"], check=True)
-        st.write(translate("postBuild_message", lang)) 
-    except subprocess.CalledProcessError as e:
-        st.error(f"{translate('postBuild_error', lang)}: {e}")  
-           
 
 # Main app setup
 def main():
     # Language Selection
     lang = st.sidebar.selectbox("Language", ["en", "ne"], index=0)
-    
-    # Run post-build script (downloads large files from LFS)
-    run_post_build_script(lang)
 
     
     # App Title and Description
