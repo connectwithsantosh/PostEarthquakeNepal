@@ -81,9 +81,9 @@ def display_uploaded_images(pre_disaster_image, post_disaster_image, lang):
     st.subheader(translate("uploaded_images", lang))
     col1, col2 = st.columns(2)
     with col1:
-        st.image(pre_disaster_image, caption=translate("pre_image_label", lang), use_column_width=True)
+        st.image(pre_disaster_image, caption=translate("pre_image_label", lang), use_container_width=True)
     with col2:
-        st.image(post_disaster_image, caption=translate("post_image_label", lang), use_column_width=True)
+        st.image(post_disaster_image, caption=translate("post_image_label", lang), use_container_width=True)
 
 
 # Perform change detection and display results
@@ -97,9 +97,9 @@ def detect_changes(model, pre_disaster_image, post_disaster_image, lang):
     st.subheader(translate("uploaded_images", lang))
     col1, col2 = st.columns(2)
     with col1:
-        st.image(loc, caption=translate("change_localization", lang), use_column_width=True)
+        st.image(loc, caption=translate("change_localization", lang), use_container_width=True)
     with col2:
-        st.image(dam, caption=translate("damage_assessment", lang), use_column_width=True)
+        st.image(dam, caption=translate("damage_assessment", lang), use_container_width=True)
 
 
 # Run the app
