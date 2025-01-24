@@ -9,11 +9,18 @@ from utils.general import translate
 # Run the post-build setup script to pull LFS files
 def run_post_build_script():
     try:
-        # Run the setup.sh script to pull large files from Git LFS
-        subprocess.run(["bash", "setup.sh"], check=True)
+        result = subprocess.run(
+            ["bash", "setup.sh"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
         st.write("Successfully downloaded large model files from Git LFS.")
+        st.write(result.stdout.decode())  # Log output
     except subprocess.CalledProcessError as e:
         st.error(f"Error while running the post-build script: {e}")
+        st.error(f"Standard Output: {e.stdout.decode()}")
+        st.error(f"Standard Error: {e.stderr.decode()}")
     
 
 # Main app setup
