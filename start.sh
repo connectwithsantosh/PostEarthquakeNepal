@@ -24,7 +24,3 @@ for model in "${MODELS[@]}"; do
 done
 
 echo "Model files downloaded successfully."
-
-# Start the Streamlit app
-echo "Starting the Streamlit app..."
-streamlit run app.py --server.port $PORT --server.address 0.0.0.0

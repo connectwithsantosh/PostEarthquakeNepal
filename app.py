@@ -1,3 +1,5 @@
+import os
+import subprocess
 import streamlit as st
 import changeos
 from PIL import Image
@@ -5,8 +7,28 @@ import requests
 from io import BytesIO
 from utils.general import translate
 
+
+# Function to ensure models are downloaded
+def download_models():
+    script_path = "./start.sh"  # Path to your shell script
+    if os.path.exists(script_path):
+        st.info("Ensuring models are downloaded...")
+        try:
+            result = subprocess.run(["bash", script_path], check=True, capture_output=True, text=True)
+            st.success("Model files are ready!")
+        except subprocess.CalledProcessError as e:
+            st.error(f"Error downloading models: {e.stderr}")
+            st.stop()  # Stop the app if models cannot be downloaded
+    else:
+        st.error("Download script not found!")
+        st.stop()
+
 # Main app setup
 def main():
+
+    # Ensure models are downloaded before proceeding
+    download_models()
+    
     # Language Selection
     lang = st.sidebar.selectbox("Language", ["en", "ne"], index=0)
 
