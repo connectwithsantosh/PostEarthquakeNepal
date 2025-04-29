@@ -1,10 +1,12 @@
 import os
-import subprocess
-import streamlit as st
-import changeos
-from PIL import Image
-import requests
 from io import BytesIO
+import subprocess
+
+import requests
+import streamlit as st
+from PIL import Image
+
+import changeos
 from utils.general import translate
 
 
